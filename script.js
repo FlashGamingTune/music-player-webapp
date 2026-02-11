@@ -5,6 +5,10 @@ const playBtn = document.getElementById("playBtn");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const nowPlaying = document.getElementById("nowPlaying");
+const seekBar = document.getElementById("seekBar");
+const timeDisplay = document.getElementById("timeDisplay");
+const volumeSlider = document.getElementById("volumeSlider");
+
 
 let currentSong = null;
 let isPlaying = false;
@@ -12,7 +16,7 @@ let songs = [];
 let currentIndex = 0;
 
 
-// Displaying which song is playing 
+// Title  /  Displaying which song is playing 
 function loadSong() {
     const file = songs[currentIndex];
     const url = URL.createObjectURL(file);
@@ -22,7 +26,7 @@ function loadSong() {
     isPlaying = true;
 
     playBtn.textContent = "⏸";
-    nowPlaying.textContent = "Playing: " + file.name;
+    nowPlaying.textContent = file.name;
 }
 
 // Converting File to Playabel File
@@ -78,4 +82,35 @@ prevBtn.addEventListener("click", () => {
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
     nextBtn.click();
+});
+
+// Timeline / Dureation
+audioPlayer.addEventListener("timeupdate", () => {
+    if (!audioPlayer.duration) return;
+
+    const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+    seekBar.value = progress;
+
+    const currentMin = Math.floor(audioPlayer.currentTime / 60);
+    const currentSec = Math.floor(audioPlayer.currentTime % 60);
+
+    const totalMin = Math.floor(audioPlayer.duration / 60);
+    const totalSec = Math.floor(audioPlayer.duration % 60);
+
+    timeDisplay.textContent =
+        `${currentMin}:${currentSec.toString().padStart(2, "0")} / ` +
+        `${totalMin}:${totalSec.toString().padStart(2, "0")}`;
+});
+
+// Drag Seek Bar
+seekBar.addEventListener("input", () => {
+  if (!audioPlayer.duration) return;
+
+  const newTime = (seekBar.value / 100) * audioPlayer.duration;
+  audioPlayer.currentTime = newTime;
+});
+
+// Volume Control
+volumeSlider.addEventListener("input", () => {
+  audioPlayer.volume = volumeSlider.value;
 });

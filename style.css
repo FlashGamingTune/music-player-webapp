@@ -108,3 +108,12 @@ header {
     cursor: pointer;
     font-size: 16px;
 }
+
+.player-bar input[type="range"] {
+    width: 100%;
+    margin: 13px;
+}
+
+.player-bar :hover{
+    cursor: pointer;
+}
