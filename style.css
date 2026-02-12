@@ -110,10 +110,10 @@ header {
 }
 
 .player-bar input[type="range"] {
-    width: 100%;
+    width: 50%;
     margin: 13px;
 }
 
-.player-bar :hover{
+.player-bar :hover {
     cursor: pointer;
 }

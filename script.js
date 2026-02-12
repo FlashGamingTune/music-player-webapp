@@ -9,6 +9,7 @@ const seekBar = document.getElementById("seekBar");
 const timeDisplay = document.getElementById("timeDisplay");
 const volumeSlider = document.getElementById("volumeSlider");
 
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
 let currentSong = null;
 let isPlaying = false;
@@ -37,7 +38,30 @@ fileInput.addEventListener("change", function () {
     songs.forEach((file, index) => {
         const songDiv = document.createElement("div");
         songDiv.className = "song-card";
-        songDiv.textContent = file.name;
+        songDiv.innerHTML = `
+                    <span>${file.name}</span>
+                    <button class="favBtn">♡</button>
+                        `;
+
+        const favBtn = songDiv.querySelector(".favBtn");
+
+        favBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // prevents playing song
+
+            if (favorites.includes(file.name)) {
+                favorites = favorites.filter(name => name !== file.name);
+                favBtn.textContent = "♡";
+            } else {
+                favorites.push(file.name);
+                favBtn.textContent = "♥";
+            }
+
+            localStorage.setItem("favorites", JSON.stringify(favorites));
+        });
+
+        if (favorites.includes(file.name)) {
+            favBtn.textContent = "♥";
+        }
 
         songDiv.addEventListener("click", () => {
             currentIndex = index;
@@ -104,13 +128,13 @@ audioPlayer.addEventListener("timeupdate", () => {
 
 // Drag Seek Bar
 seekBar.addEventListener("input", () => {
-  if (!audioPlayer.duration) return;
+    if (!audioPlayer.duration) return;
 
-  const newTime = (seekBar.value / 100) * audioPlayer.duration;
-  audioPlayer.currentTime = newTime;
+    const newTime = (seekBar.value / 100) * audioPlayer.duration;
+    audioPlayer.currentTime = newTime;
 });
 
 // Volume Control
 volumeSlider.addEventListener("input", () => {
-  audioPlayer.volume = volumeSlider.value;
+    audioPlayer.volume = volumeSlider.value;
 });
