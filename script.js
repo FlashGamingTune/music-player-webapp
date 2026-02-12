@@ -11,8 +11,6 @@ const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 
-
-let currentSong = null;
 let isPlaying = false;
 let songs = [];
 let currentIndex = 0;
@@ -23,6 +21,14 @@ let repeatMode = "off";
 
 // Title  /  Displaying which song is playing 
 function loadSong() {
+
+    if (!songs[currentIndex]) return;
+
+    // Close previous temporary URL if exists
+    if (audioPlayer.src) {
+        URL.revokeObjectURL(audioPlayer.src);
+    }
+
     const file = songs[currentIndex];
     const url = URL.createObjectURL(file);
 
@@ -34,7 +40,7 @@ function loadSong() {
     nowPlaying.textContent = file.name;
 }
 
-// Converting File to Playabel File
+// Converting File to Playable File
 fileInput.addEventListener("change", function () {
     songs = Array.from(this.files);
     songsContainer.innerHTML = "";
@@ -57,14 +63,14 @@ fileInput.addEventListener("change", function () {
                 favBtn.textContent = "♡";
             } else {
                 favorites.push(file.name);
-                favBtn.textContent = "♥";
+                favBtn.textContent = "❤️";
             }
 
             localStorage.setItem("favorites", JSON.stringify(favorites));
         });
 
         if (favorites.includes(file.name)) {
-            favBtn.textContent = "♥";
+            favBtn.textContent = "❤️";
         }
 
         songDiv.addEventListener("click", () => {
@@ -115,12 +121,36 @@ prevBtn.addEventListener("click", () => {
 
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
+
     if (repeatMode === "one") {
+        // Repeat same song
         loadSong();
-    } else if (repeatMode === "all") {
-        nextBtn.click();
+        return;
+    }
+
+    if (isShuffle) {
+        currentIndex = Math.floor(Math.random() * songs.length);
+        loadSong();
+        return;
+    }
+
+    // Go to next song normally
+    if (currentIndex < songs.length - 1) {
+        currentIndex++;
+        loadSong();
+    } else {
+        // Playlist finished
+        if (repeatMode === "all") {
+            currentIndex = 0;
+            loadSong();
+        } else {
+            // Stop completely
+            isPlaying = false;
+            playBtn.textContent = "▶";
+        }
     }
 });
+
 
 
 // Timeline / Dureation
@@ -172,6 +202,6 @@ repeatBtn.addEventListener("click", () => {
     } else {
         repeatMode = "off";
         repeatBtn.style.color = "white";
-        repeatBtn.textContent = "2️⃣";
+        repeatBtn.textContent = "🔃";
     }
 });

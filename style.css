@@ -10,10 +10,11 @@ body {
     color: white;
     font-family: 'Segoe UI', sans-serif;
     overflow-y: auto;
+    padding-bottom: 140px;
 }
 
 /* Header */
-header {
+.header {
     background: #181818;
     padding: 15px;
     text-align: center;
@@ -22,7 +23,7 @@ header {
 /* Layout */
 .main-container {
     display: flex;
-    height: 75vh;
+    min-height: calc(100vh - 120px);
 }
 
 /* Sidebar */
@@ -30,7 +31,6 @@ header {
     width: 20%;
     background: #181818;
     padding: 20px;
-    /* padding: 200px 20px 40% 20px; */
 }
 
 .sidebar h3 {
@@ -57,9 +57,7 @@ header {
 .song-list {
     width: 80%;
     padding: 20px;
-    position: flex;
-    top: 100px;
-    left: 20%;
+    padding-bottom: 200px;
 }
 
 .song-card {
@@ -114,6 +112,12 @@ header {
     margin: 13px;
 }
 
-.player-bar :hover {
+.player-bar button:hover {
+    opacity: 70%;
     cursor: pointer;
+}
+
+.player-bar button:active {
+    opacity: 40%;
+    margin: 5px;
 }
