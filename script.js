@@ -8,13 +8,17 @@ const nowPlaying = document.getElementById("nowPlaying");
 const seekBar = document.getElementById("seekBar");
 const timeDisplay = document.getElementById("timeDisplay");
 const volumeSlider = document.getElementById("volumeSlider");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const repeatBtn = document.getElementById("repeatBtn");
 
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
 let currentSong = null;
 let isPlaying = false;
 let songs = [];
 let currentIndex = 0;
+let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+let isShuffle = false;
+let repeatMode = "off";
 
 
 // Title  /  Displaying which song is playing 
@@ -91,9 +95,15 @@ playBtn.addEventListener("click", () => {
 nextBtn.addEventListener("click", () => {
     if (songs.length === 0) return;
 
-    currentIndex = (currentIndex + 1) % songs.length;
+    if (isShuffle) {
+        currentIndex = Math.floor(Math.random() * songs.length);
+    } else {
+        currentIndex = (currentIndex + 1) % songs.length;
+    }
+
     loadSong();
 });
+
 
 // Previous Song Logic
 prevBtn.addEventListener("click", () => {
@@ -105,8 +115,13 @@ prevBtn.addEventListener("click", () => {
 
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
-    nextBtn.click();
+    if (repeatMode === "one") {
+        loadSong();
+    } else if (repeatMode === "all") {
+        nextBtn.click();
+    }
 });
+
 
 // Timeline / Dureation
 audioPlayer.addEventListener("timeupdate", () => {
@@ -137,4 +152,26 @@ seekBar.addEventListener("input", () => {
 // Volume Control
 volumeSlider.addEventListener("input", () => {
     audioPlayer.volume = volumeSlider.value;
+});
+
+// Shuffle Button Logic
+shuffleBtn.addEventListener("click", () => {
+    isShuffle = !isShuffle;
+    shuffleBtn.style.color = isShuffle ? "lime" : "white";
+});
+
+// Repeat Button Logic
+repeatBtn.addEventListener("click", () => {
+    if (repeatMode === "off") {
+        repeatMode = "all";
+        repeatBtn.textContent = "🔁";
+        repeatBtn.style.color = "lime";
+    } else if (repeatMode === "all") {
+        repeatMode = "one";
+        repeatBtn.textContent = "1️⃣";
+    } else {
+        repeatMode = "off";
+        repeatBtn.style.color = "white";
+        repeatBtn.textContent = "2️⃣";
+    }
 });
