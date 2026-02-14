@@ -89,6 +89,11 @@ body {
 
 }
 
+.song-card.active {
+    background: #333;
+    border-left: 4px solid #1DB954;
+}
+
 /* Bottom Player Bar */
 .player-bar {
     background-color: #181818;
@@ -97,6 +102,7 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
+    transition: transform 0.1s ease;
 }
 
 .player-bar button {
@@ -110,8 +116,8 @@ body {
 }
 
 .player-bar input[type="range"] {
-    width: 50%;
-    margin: 13px;
+    width: 150px;
+    margin: 0 10px;
 }
 
 .player-bar button:hover {
@@ -122,4 +128,5 @@ body {
 .player-bar button:active {
     opacity: 40%;
     margin: 5px;
+    transform: scale(0.9);
 }

@@ -12,42 +12,52 @@ const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 
-let isPlaying = false;
-let songs = [];
-let currentIndex = 0;
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-let isShuffle = false;
-let repeatMode = "off";
+
+// let songs = [];
+// let currentIndex =   0;
+// let isPlaying = false;
+// let isShuffle = false;
+// let repeatMode = "off";
+// let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+const playerState = {
+    songs: [],
+    currentIndex: 0,
+    isPlaying: false,
+    isShuffle: false,
+    repeatMode: "off",
+    favorites: JSON.parse(localStorage.getItem("favorites")) || []
+};
 
 
 // Title  /  Displaying which song is playing 
+let currentObjectURL = null;
+
 function loadSong() {
-    
-    if (!songs[currentIndex]) return;
-    
-    // Close previous temporary URL if exists
-    if (audioPlayer.src) {
-        URL.revokeObjectURL(audioPlayer.src);
+    if (!playerState.songs[playerState.currentIndex]) return;
+
+    if (currentObjectURL) {
+        URL.revokeObjectURL(currentObjectURL);
     }
-    
-    const file = songs[currentIndex];
+
+    const file = playerState.songs[playerState.currentIndex];
+
     miniTitle.textContent = file.name;
-    const url = URL.createObjectURL(file);
 
-    audioPlayer.src = url;
+    currentObjectURL = URL.createObjectURL(file);
+    audioPlayer.src = currentObjectURL;
+
     audioPlayer.play();
-    isPlaying = true;
-
+    playerState.isPlaying = true;
     playBtn.textContent = "⏸";
-    // nowPlaying.textContent = file.name;
 }
 
 // Converting File to Playable File
 fileInput.addEventListener("change", function () {
-    songs = Array.from(this.files);
+    playerState.songs = Array.from(this.files);
     songsContainer.innerHTML = "";
 
-    songs.forEach((file, index) => {
+    playerState.songs.forEach((file, index) => {
         const songDiv = document.createElement("div");
         songDiv.className = "song-card";
         songDiv.innerHTML = `
@@ -60,23 +70,23 @@ fileInput.addEventListener("change", function () {
         favBtn.addEventListener("click", (e) => {
             e.stopPropagation(); // prevents playing song
 
-            if (favorites.includes(file.name)) {
-                favorites = favorites.filter(name => name !== file.name);
+            if (playerState.favorites.includes(file.name)) {
+                playerState.favorites = playerState.favorites.filter(name => name !== file.name);
                 favBtn.textContent = "♡";
             } else {
-                favorites.push(file.name);
+                playerState.favorites.push(file.name);
                 favBtn.textContent = "❤️";
             }
 
-            localStorage.setItem("favorites", JSON.stringify(favorites));
+            localStorage.setItem("favorites", JSON.stringify(playerState.favorites));
         });
 
-        if (favorites.includes(file.name)) {
+        if (playerState.favorites.includes(file.name)) {
             favBtn.textContent = "❤️";
         }
 
         songDiv.addEventListener("click", () => {
-            currentIndex = index;
+            playerState.currentIndex = index;
             loadSong();
         });
 
@@ -88,7 +98,7 @@ fileInput.addEventListener("change", function () {
 playBtn.addEventListener("click", () => {
     if (!audioPlayer.src) return;
 
-    if (isPlaying) {
+    if (playerState.isPlaying) {
         audioPlayer.pause();
         playBtn.textContent = "▶";
     } else {
@@ -96,17 +106,17 @@ playBtn.addEventListener("click", () => {
         playBtn.textContent = "⏸";
     }
 
-    isPlaying = !isPlaying;
+    playerState.isPlaying = !playerState.isPlaying;
 });
 
 // Next Song Logic
 nextBtn.addEventListener("click", () => {
-    if (songs.length === 0) return;
+    if (playerState.songs.length === 0) return;
 
-    if (isShuffle) {
-        currentIndex = Math.floor(Math.random() * songs.length);
+    if (playerState.isShuffle) {
+        playerState.currentIndex = Math.floor(Math.random() * playerState.songs.length);
     } else {
-        currentIndex = (currentIndex + 1) % songs.length;
+        playerState.currentIndex = (playerState.currentIndex + 1) % playerState.songs.length;
     }
 
     loadSong();
@@ -115,39 +125,39 @@ nextBtn.addEventListener("click", () => {
 
 // Previous Song Logic
 prevBtn.addEventListener("click", () => {
-    if (songs.length === 0) return;
+    if (playerState.songs.length === 0) return;
 
-    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    playerState.currentIndex = (playerState.currentIndex - 1 + playerState.songs.length) % playerState.songs.length;
     loadSong();
 });
 
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
 
-    if (repeatMode === "one") {
+    if (playerState.repeatMode === "one") {
         // Repeat same song
         loadSong();
         return;
     }
 
-    if (isShuffle) {
-        currentIndex = Math.floor(Math.random() * songs.length);
+    if (playerState.isShuffle) {
+        playerState.currentIndex = Math.floor(Math.random() * playerState.songs.length);
         loadSong();
         return;
     }
 
     // Go to next song normally
-    if (currentIndex < songs.length - 1) {
-        currentIndex++;
+    if (playerState.currentIndex < playerState.songs.length - 1) {
+        playerState.currentIndex++;
         loadSong();
     } else {
         // Playlist finished
-        if (repeatMode === "all") {
-            currentIndex = 0;
+        if (playerState.repeatMode === "all") {
+            playerState.currentIndex = 0;
             loadSong();
         } else {
             // Stop completely
-            isPlaying = false;
+            playerState.isPlaying = false;
             playBtn.textContent = "▶";
         }
     }
@@ -188,21 +198,21 @@ volumeSlider.addEventListener("input", () => {
 
 // Shuffle Button Logic
 shuffleBtn.addEventListener("click", () => {
-    isShuffle = !isShuffle;
-    shuffleBtn.style.color = isShuffle ? "lime" : "white";
+    playerState.isShuffle = !playerState.isShuffle;
+    shuffleBtn.style.color = playerState.isShuffle ? "lime" : "white";
 });
 
 // Repeat Button Logic
 repeatBtn.addEventListener("click", () => {
-    if (repeatMode === "off") {
-        repeatMode = "all";
+    if (playerState.repeatMode === "off") {
+        playerState.repeatMode = "all";
         repeatBtn.textContent = "🔁";
         repeatBtn.style.color = "lime";
-    } else if (repeatMode === "all") {
-        repeatMode = "one";
+    } else if (playerState.repeatMode === "all") {
+        playerState.repeatMode = "one";
         repeatBtn.textContent = "1️⃣";
     } else {
-        repeatMode = "off";
+        playerState.repeatMode = "off";
         repeatBtn.style.color = "white";
         repeatBtn.textContent = "🔃";
     }
