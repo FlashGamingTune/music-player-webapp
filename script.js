@@ -42,14 +42,35 @@ function loadSong() {
 
     const file = playerState.songs[playerState.currentIndex];
 
-    miniTitle.textContent = file.name;
-
     currentObjectURL = URL.createObjectURL(file);
     audioPlayer.src = currentObjectURL;
 
     audioPlayer.play();
     playerState.isPlaying = true;
-    playBtn.textContent = "⏸";
+
+    updatePlayerUI();
+}
+
+function updatePlayerUI() {
+    const file = playerState.songs[playerState.currentIndex];
+
+    if (!file) return;
+
+    miniTitle.textContent = file.name;
+    playBtn.textContent = playerState.isPlaying ? "⏸" : "▶";
+
+    highlightActiveSong();
+}
+
+function highlightActiveSong() {
+    const allCards = document.querySelectorAll(".song-card");
+
+    allCards.forEach(card => card.classList.remove("active"));
+
+    const activeCard = allCards[playerState.currentIndex];
+    if (activeCard) {
+        activeCard.classList.add("active");
+    }
 }
 
 // Converting File to Playable File
