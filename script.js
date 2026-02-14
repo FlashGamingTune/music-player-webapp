@@ -4,7 +4,8 @@ const audioPlayer = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playBtn");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
-const nowPlaying = document.getElementById("nowPlaying");
+const miniTitle = document.getElementById("miniTitle");
+// const nowPlaying = document.getElementById("nowPlaying");
 const seekBar = document.getElementById("seekBar");
 const timeDisplay = document.getElementById("timeDisplay");
 const volumeSlider = document.getElementById("volumeSlider");
@@ -21,15 +22,16 @@ let repeatMode = "off";
 
 // Title  /  Displaying which song is playing 
 function loadSong() {
-
+    
     if (!songs[currentIndex]) return;
-
+    
     // Close previous temporary URL if exists
     if (audioPlayer.src) {
         URL.revokeObjectURL(audioPlayer.src);
     }
-
+    
     const file = songs[currentIndex];
+    miniTitle.textContent = file.name;
     const url = URL.createObjectURL(file);
 
     audioPlayer.src = url;
@@ -37,7 +39,7 @@ function loadSong() {
     isPlaying = true;
 
     playBtn.textContent = "⏸";
-    nowPlaying.textContent = file.name;
+    // nowPlaying.textContent = file.name;
 }
 
 // Converting File to Playable File

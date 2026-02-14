@@ -10,7 +10,7 @@ body {
     color: white;
     font-family: 'Segoe UI', sans-serif;
     overflow-y: auto;
-    padding-bottom: 140px;
+    /* padding-bottom: 140px; */
 }
 
 /* Header */
@@ -68,7 +68,7 @@ body {
     padding: 15px;
     margin-bottom: 8px;
     border-radius: 8px;
-    transition: 0.3s;
+    transition: transform 0.2s, background 0.3s;
 }
 
 .song-card img {
@@ -85,6 +85,8 @@ body {
 .song-card:hover {
     background: #333;
     cursor: pointer;
+    transform: scale(1.03);
+
 }
 
 /* Bottom Player Bar */
