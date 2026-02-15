@@ -12,21 +12,14 @@ const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 
-
-// let songs = [];
-// let currentIndex =   0;
-// let isPlaying = false;
-// let isShuffle = false;
-// let repeatMode = "off";
-// let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
 const playerState = {
     songs: [],
     currentIndex: 0,
     isPlaying: false,
     isShuffle: false,
     repeatMode: "off",
-    favorites: JSON.parse(localStorage.getItem("favorites")) || []
+    favorites: JSON.parse(localStorage.getItem("favorites")) || [],
+    shuffleHistory: []
 };
 
 
@@ -73,6 +66,72 @@ function highlightActiveSong() {
     }
 }
 
+// Play/Pause Toggle
+function togglePlayPause() {
+    if (!audioPlayer.src) return;
+
+    if (playerState.isPlaying) {
+        audioPlayer.pause();
+        playerState.isPlaying = false;
+    } else {
+        audioPlayer.play();
+        playerState.isPlaying = true;
+    }
+
+    updatePlayerUI();
+}
+
+// Play Next Song Function
+function playNextSong() {
+    if (playerState.songs.length === 0) return;
+
+    if (playerState.isShuffle) {
+        // Store current index before changing
+        playerState.shuffleHistory.push(playerState.currentIndex);
+
+        let randomIndex;
+
+        do {
+            randomIndex = Math.floor(Math.random() * playerState.songs.length);
+        } while (
+            playerState.songs.length > 1 &&
+            randomIndex === playerState.currentIndex
+        );
+
+        playerState.currentIndex = randomIndex;
+    } else {
+        playerState.currentIndex =
+            (playerState.currentIndex + 1) %
+            playerState.songs.length;
+    }
+
+    loadSong();
+}
+
+// Play Previous Song Function
+function playPreviousSong() {
+    if (playerState.songs.length === 0) return;
+
+    if (playerState.isShuffle) {
+        if (playerState.shuffleHistory.length > 0) {
+            // Go back in shuffle history
+            playerState.currentIndex =
+                playerState.shuffleHistory.pop();
+        } else {
+            // fallback to normal previous behaviour
+            playerState.currentIndex =
+                (playerState.currentIndex - 1 + playerState.songs.length) %
+                playerState.songs.length;
+        }
+    } else {
+        playerState.currentIndex =
+            (playerState.currentIndex - 1 + playerState.songs.length) %
+            playerState.songs.length;
+    }
+
+    loadSong();
+}
+
 // Converting File to Playable File
 fileInput.addEventListener("change", function () {
     playerState.songs = Array.from(this.files);
@@ -116,51 +175,24 @@ fileInput.addEventListener("change", function () {
 });
 
 // Checking For Clicks to Convert ▶ <-> ⏸
-playBtn.addEventListener("click", () => {
-    if (!audioPlayer.src) return;
+playBtn.addEventListener("click", togglePlayPause);
 
-    if (playerState.isPlaying) {
-        audioPlayer.pause();
-        playBtn.textContent = "▶";
-    } else {
-        audioPlayer.play();
-        playBtn.textContent = "⏸";
-    }
+// Next Song EventLstener
+nextBtn.addEventListener("click", playNextSong);
 
-    playerState.isPlaying = !playerState.isPlaying;
-});
-
-// Next Song Logic
-nextBtn.addEventListener("click", () => {
-    if (playerState.songs.length === 0) return;
-
-    if (playerState.isShuffle) {
-        playerState.currentIndex = Math.floor(Math.random() * playerState.songs.length);
-    } else {
-        playerState.currentIndex = (playerState.currentIndex + 1) % playerState.songs.length;
-    }
-
-    loadSong();
-});
-
-
-// Previous Song Logic
-prevBtn.addEventListener("click", () => {
-    if (playerState.songs.length === 0) return;
-
-    playerState.currentIndex = (playerState.currentIndex - 1 + playerState.songs.length) % playerState.songs.length;
-    loadSong();
-});
+// Previous Song EventListener
+prevBtn.addEventListener("click", playPreviousSong);
 
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
 
+    // Repeats Same Song
     if (playerState.repeatMode === "one") {
-        // Repeat same song
         loadSong();
         return;
     }
 
+    // Shuffle Player
     if (playerState.isShuffle) {
         playerState.currentIndex = Math.floor(Math.random() * playerState.songs.length);
         loadSong();
@@ -220,7 +252,13 @@ volumeSlider.addEventListener("input", () => {
 // Shuffle Button Logic
 shuffleBtn.addEventListener("click", () => {
     playerState.isShuffle = !playerState.isShuffle;
-    shuffleBtn.style.color = playerState.isShuffle ? "lime" : "white";
+
+    if (!playerState.isShuffle) {
+        playerState.shuffleHistory = [];
+    }
+
+    shuffleBtn.style.color =
+        playerState.isShuffle ? "lime" : "white";
 });
 
 // Repeat Button Logic
@@ -236,5 +274,27 @@ repeatBtn.addEventListener("click", () => {
         playerState.repeatMode = "off";
         repeatBtn.style.color = "white";
         repeatBtn.textContent = "🔃";
+    }
+});
+
+// Keyboard Controller
+document.addEventListener("keydown", (e) => {
+
+    // Prevent interfering with sliders or file input
+    if (e.target.tagName === "INPUT") return;
+
+    switch (e.code) {
+        case "Space":
+            e.preventDefault(); // prevent page scroll
+            togglePlayPause();
+            break;
+
+        case "ArrowRight":
+            playNextSong();
+            break;
+
+        case "ArrowLeft":
+            playPreviousSong();
+            break;
     }
 });
