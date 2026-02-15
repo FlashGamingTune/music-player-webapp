@@ -163,9 +163,22 @@ function renderRecentlyPlayed() {
     playerState.recentlyPlayed.forEach(name => {
         const li = document.createElement("li");
         li.textContent = name;
+
+        li.addEventListener("click", () => {
+            const index = playerState.songs.findIndex(
+                song => song.name === name
+            );
+
+            if (index !== -1) {
+                playerState.currentIndex = index;
+                loadSong();
+            }
+        });
+
         recentList.appendChild(li);
     });
 }
+
 
 // Converting File to Playable File
 fileInput.addEventListener("change", function () {
