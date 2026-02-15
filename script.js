@@ -85,7 +85,35 @@ function updatePlayerUI() {
     playBtn.textContent = playerState.isPlaying ? "⏸" : "▶";
 
     highlightActiveSong();
+    
+    const miniCover = document.querySelector(".mini-cover");
+
+    jsmediatags.read(file, {
+        onSuccess: function(tag) {
+            if (tag.tags.picture) {
+                const { data, format } = tag.tags.picture;
+                let base64String = "";
+
+                for (let i = 0; i < data.length; i++) {
+                    base64String += String.fromCharCode(data[i]);
+                }
+
+                const coverUrl =
+                    `data:${format};base64,${window.btoa(base64String)}`;
+
+                miniCover.style.backgroundImage = `url(${coverUrl})`;
+                miniCover.style.backgroundSize = "cover";
+                miniCover.style.backgroundPosition = "center";
+            } else {
+                miniCover.style.backgroundImage = "none";
+            }
+        },
+        onError: function(error) {
+            console.log("Cover error:", error);
+        }
+    });
 }
+
 
 function highlightActiveSong() {
     const allCards = document.querySelectorAll(".song-card");
@@ -220,39 +248,62 @@ fileInput.addEventListener("change", function () {
     songsContainer.innerHTML = "";
 
     playerState.songs.forEach((file, index) => {
-        const songDiv = document.createElement("div");
-        songDiv.className = "song-card";
-        songDiv.innerHTML = `
-                    <span>${file.name}</span>
-                    <button class="favBtn">♡</button>
-                        `;
 
-        const favBtn = songDiv.querySelector(".favBtn");
+        jsmediatags.read(file, {
+            onSuccess: function (tag) {
 
-        favBtn.addEventListener("click", (e) => {
-            e.stopPropagation(); // prevents playing song
+                let coverUrl = null;
 
-            if (playerState.favorites.includes(file.name)) {
-                playerState.favorites = playerState.favorites.filter(name => name !== file.name);
-                favBtn.textContent = "♡";
-            } else {
-                playerState.favorites.push(file.name);
-                favBtn.textContent = "❤️";
+                if (tag.tags.picture) {
+                    const { data, format } = tag.tags.picture;
+                    let base64String = "";
+                    for (let i = 0; i < data.length; i++) {
+                        base64String += String.fromCharCode(data[i]);
+                    }
+                    coverUrl = `data:${format};base64,${window.btoa(base64String)}`;
+                }
+
+                const songDiv = document.createElement("div");
+                songDiv.className = "song-card";
+
+                songDiv.innerHTML = `
+                <img src="${coverUrl || 'https://via.placeholder.com/50'}" 
+                     class="cover-img">
+                <span>${file.name}</span>
+                <button class="favBtn">♡</button>
+            `;
+
+                const favBtn = songDiv.querySelector(".favBtn");
+
+                favBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+
+                    if (playerState.favorites.includes(file.name)) {
+                        playerState.favorites =
+                            playerState.favorites.filter(name => name !== file.name);
+                        favBtn.textContent = "♡";
+                    } else {
+                        playerState.favorites.push(file.name);
+                        favBtn.textContent = "❤️";
+                    }
+
+                    localStorage.setItem("favorites",
+                        JSON.stringify(playerState.favorites));
+                });
+
+                songDiv.addEventListener("click", () => {
+                    playerState.currentIndex = index;
+                    loadSong();
+                });
+
+                songsContainer.appendChild(songDiv);
+            },
+
+            onError: function (error) {
+                console.log("Metadata error:", error);
             }
-
-            localStorage.setItem("favorites", JSON.stringify(playerState.favorites));
         });
 
-        if (playerState.favorites.includes(file.name)) {
-            favBtn.textContent = "❤️";
-        }
-
-        songDiv.addEventListener("click", () => {
-            playerState.currentIndex = index;
-            loadSong();
-        });
-
-        songsContainer.appendChild(songDiv);
     });
 });
 

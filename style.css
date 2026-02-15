@@ -96,12 +96,13 @@ body {
 .song-card {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
     background: var(--bg-card);
     padding: 12px 15px;
     margin-bottom: 8px;
     border-radius: 8px;
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
 .song-card span {
@@ -152,8 +153,12 @@ body {
 .mini-cover {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, var(--accent), var(--accent));
     border-radius: 6px;
+    background-color: var(--bg-card);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
 }
 
 .player-center {
@@ -243,4 +248,12 @@ body {
 
 #recentList li:hover {
     color: white;
+}
+
+.cover-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
