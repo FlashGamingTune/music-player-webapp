@@ -49,24 +49,24 @@
 
     <footer class="player-bar">
 
-        <div id="miniInfo">
+        <div class="player-left">
             <strong id="miniTitle">No song</strong>
         </div>
 
-        <!-- <p id="nowPlaying">No song selected</p> -->
+        <div class="player-center">
+            <button id="prevBtn">⏮</button>
+            <button id="playBtn">▶</button>
+            <button id="nextBtn">⏭</button>
+            <button id="shuffleBtn">🔀</button>
+            <button id="repeatBtn">🔁</button>
 
-        <button id="prevBtn">⏮</button>
-        <button id="nextBtn">⏭</button>
-        <button id="playBtn">▶</button>
-        <button id="shuffleBtn">🔀</button>
-        <button id="repeatBtn">🔁</button>
+            <p id="timeDisplay">0:00 / 0:00</p>
+            <input type="range" id="seekBar" value="0" min="0" max="100">
+        </div>
 
-        <p id="timeDisplay">0:00 / 0:00</p>
-
-
-        <input type="range" id="seekBar" value="0" min="0" max="100">
-
-        <input type="range" id="volumeSlider" value="1" min="0" max="1" step="0.01">
+        <div class="player-right">
+            <input type="range" id="volumeSlider" value="1" min="0" max="1" step="0.01">
+        </div>
 
     </footer>
 

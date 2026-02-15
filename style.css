@@ -28,7 +28,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 20%;
+    width: 18%;
     background: #181818;
     padding: 20px;
 }
@@ -55,7 +55,7 @@ body {
 
 /* Song List */
 .song-list {
-    width: 80%;
+    width: 82%;
     padding: 20px;
     padding-bottom: 200px;
 }
@@ -63,12 +63,23 @@ body {
 .song-card {
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: space-between;
     background: #282828;
-    padding: 15px;
+    padding: 12px 15px;
     margin-bottom: 8px;
     border-radius: 8px;
-    transition: transform 0.2s, background 0.3s;
+    transition: all 0.2s ease;
+}
+
+.song-card span {
+    flex: 1;
+}
+
+.song-card button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .song-card img {
@@ -92,32 +103,48 @@ body {
 .song-card.active {
     background: #333;
     border-left: 4px solid #1DB954;
+    transform: scale(1.01)
 }
 
 /* Bottom Player Bar */
 .player-bar {
     background-color: #181818;
-    padding: 20px;
-    text-align: center;
     position: fixed;
     bottom: 0;
     width: 100%;
-    transition: transform 0.1s ease;
+    padding: 15px 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.player-bar button {
-    background: #1bd945;
+.player-left {
+    width: 25%;
+}
+
+.player-center {
+    width: 50%;
+    text-align: center;
+}
+
+.player-right {
+    width: 25%;
+    text-align: right;
+}
+
+.player-center button {
+    background: #1db954;
     border: none;
-    padding: 10px 15px;
-    margin: 5px;
+    padding: 8px 12px;
+    margin: 0 5px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 16px;
 }
 
-.player-bar input[type="range"] {
-    width: 150px;
-    margin: 0 10px;
+.player-center input[type="range"] {
+    width: 60%;
+    margin-top: 5px;
 }
 
 .player-bar button:hover {
@@ -129,4 +156,29 @@ body {
     opacity: 40%;
     margin: 5px;
     transform: scale(0.9);
+}
+
+.sidebar h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #b3b3b3;
+}
+
+#recentList {
+    list-style: none;
+    padding-left: 0;
+}
+
+#recentList li {
+    font-size: 13px;
+    color: #b3b3b3;
+    padding: 6px 0;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+#recentList li:hover {
+    color: white;
 }
