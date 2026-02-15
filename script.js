@@ -186,37 +186,25 @@ prevBtn.addEventListener("click", playPreviousSong);
 // Auto-Play Next Song
 audioPlayer.addEventListener("ended", () => {
 
-    // Repeats Same Song
     if (playerState.repeatMode === "one") {
         loadSong();
         return;
     }
 
-    // Shuffle Player
-    if (playerState.isShuffle) {
-        playerState.currentIndex = Math.floor(Math.random() * playerState.songs.length);
-        loadSong();
+    if (playerState.repeatMode === "all") {
+        playNextSong();
         return;
     }
 
-    // Go to next song normally
-    if (playerState.currentIndex < playerState.songs.length - 1) {
-        playerState.currentIndex++;
-        loadSong();
-    } else {
-        // Playlist finished
-        if (playerState.repeatMode === "all") {
-            playerState.currentIndex = 0;
-            loadSong();
+    if (playerState.repeatMode === "off") {
+        if (playerState.currentIndex < playerState.songs.length - 1) {
+            playNextSong();
         } else {
-            // Stop completely
             playerState.isPlaying = false;
-            playBtn.textContent = "▶";
+            updatePlayerUI();
         }
     }
-});
-
-
+});6
 
 // Timeline / Dureation
 audioPlayer.addEventListener("timeupdate", () => {
@@ -265,7 +253,7 @@ shuffleBtn.addEventListener("click", () => {
 repeatBtn.addEventListener("click", () => {
     if (playerState.repeatMode === "off") {
         playerState.repeatMode = "all";
-        repeatBtn.textContent = "🔁";
+        repeatBtn.textContent = "🔃";
         repeatBtn.style.color = "lime";
     } else if (playerState.repeatMode === "all") {
         playerState.repeatMode = "one";
@@ -273,7 +261,7 @@ repeatBtn.addEventListener("click", () => {
     } else {
         playerState.repeatMode = "off";
         repeatBtn.style.color = "white";
-        repeatBtn.textContent = "🔃";
+        repeatBtn.textContent = "🔁";
     }
 });
 
