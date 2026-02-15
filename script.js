@@ -12,6 +12,7 @@ const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 
+
 const playerState = {
     songs: [],
     currentIndex: 0,
@@ -23,7 +24,7 @@ const playerState = {
     recentlyPlayed: []
 };
 
-// Title  /  Displaying which song is playing 
+let animationFrameId = null;
 let currentObjectURL = null;
 
 function loadSong() {
@@ -40,6 +41,13 @@ function loadSong() {
 
     audioPlayer.play();
     playerState.isPlaying = true;
+
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+
+    animationFrameId = requestAnimationFrame(updateProgressBarSmooth);
+
 
     updatePlayerUI();
     updateRecentlyPlayed();
@@ -96,6 +104,8 @@ function togglePlayPause() {
     if (playerState.isPlaying) {
         audioPlayer.pause();
         playerState.isPlaying = false;
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
     } else {
         audioPlayer.play();
         playerState.isPlaying = true;
@@ -179,6 +189,29 @@ function renderRecentlyPlayed() {
     });
 }
 
+function updateProgressBarSmooth() {
+    if (!playerState.isPlaying) return;
+
+    if (!audioPlayer.duration) {
+        animationFrameId = requestAnimationFrame(updateProgressBarSmooth);
+        return;
+    }
+
+    const progress =
+        (audioPlayer.currentTime / audioPlayer.duration) * 100;
+
+    seekBar.value = progress;
+
+    seekBar.style.background = `linear-gradient(
+        to right,
+        #1db954 0%,
+        #1db954 ${progress}%,
+        #404040 ${progress}%,
+        #404040 100%
+    )`;
+
+    animationFrameId = requestAnimationFrame(updateProgressBarSmooth);
+}
 
 // Converting File to Playable File
 fileInput.addEventListener("change", function () {
@@ -252,7 +285,7 @@ audioPlayer.addEventListener("ended", () => {
             updatePlayerUI();
         }
     }
-});6
+});
 
 // Timeline / Dureation
 audioPlayer.addEventListener("timeupdate", () => {

@@ -1,8 +1,10 @@
+/* =========================
+   RESET
+========================= */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
 }
 
 body {
@@ -10,23 +12,28 @@ body {
     color: white;
     font-family: 'Segoe UI', sans-serif;
     overflow-y: auto;
-    /* padding-bottom: 140px; */
 }
 
-/* Header */
+/* =========================
+   HEADER
+========================= */
 .header {
     background: #181818;
     padding: 15px;
     text-align: center;
 }
 
-/* Layout */
+/* =========================
+   LAYOUT
+========================= */
 .main-container {
     display: flex;
     min-height: calc(100vh - 120px);
 }
 
-/* Sidebar */
+/* =========================
+   SIDEBAR
+========================= */
 .sidebar {
     width: 18%;
     background: #181818;
@@ -34,7 +41,10 @@ body {
 }
 
 .sidebar h3 {
-    margin-bottom: 20px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    letter-spacing: 1px;
     color: #b3b3b3;
 }
 
@@ -43,17 +53,20 @@ body {
 }
 
 .sidebar li {
-    padding: 10px 0;
-    cursor: pointer;
+    padding: 8px 0;
+    font-size: 13px;
     color: #b3b3b3;
+    cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .sidebar li:hover {
     color: white;
-    transition: 0.3s;
 }
 
-/* Song List */
+/* =========================
+   SONG LIST
+========================= */
 .song-list {
     width: 82%;
     padding: 20px;
@@ -73,6 +86,8 @@ body {
 
 .song-card span {
     flex: 1;
+    color: #b3b3b3;
+    font-size: 14px;
 }
 
 .song-card button {
@@ -82,38 +97,26 @@ body {
     cursor: pointer;
 }
 
-.song-card img {
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-}
-
-.song-card span {
-    color: #b3b3b3;
-    font-size: 14px;
-}
-
 .song-card:hover {
     background: #333;
-    cursor: pointer;
-    transform: scale(1.03);
-
+    transform: scale(1.02);
 }
 
 .song-card.active {
     background: #333;
     border-left: 4px solid #1DB954;
-    transform: scale(1.01)
+    transform: scale(1.01);
 }
 
-/* Bottom Player Bar */
+/* =========================
+   PLAYER BAR
+========================= */
 .player-bar {
     background-color: #181818;
     position: fixed;
     bottom: 0;
     width: 100%;
     padding: 15px 30px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -121,16 +124,21 @@ body {
 
 .player-left {
     width: 25%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mini-cover {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #1db954, #1ed760);
+    border-radius: 6px;
 }
 
 .player-center {
     width: 50%;
     text-align: center;
-}
-
-.player-right {
-    width: 25%;
-    text-align: right;
 }
 
 .player-center button {
@@ -140,32 +148,66 @@ body {
     margin: 0 5px;
     border-radius: 50%;
     cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
 }
 
-.player-center input[type="range"] {
-    width: 60%;
-    margin-top: 5px;
+.player-center button:hover {
+    opacity: 0.7;
 }
 
-.player-bar button:hover {
-    opacity: 70%;
-    cursor: pointer;
-}
-
-.player-bar button:active {
-    opacity: 40%;
-    margin: 5px;
+.player-center button:active {
+    opacity: 0.4;
     transform: scale(0.9);
 }
 
-.sidebar h3 {
-    margin-top: 25px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #b3b3b3;
+.player-center input[type="range"],
+.player-right input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 60%;
+    height: 4px;
+    background: #404040;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
 }
 
+.player-center input[type="range"]::-webkit-slider-runnable-track,
+.player-right input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #404040;
+    border-radius: 4px;
+}
+
+.player-center input[type="range"]::-webkit-slider-thumb,
+.player-right input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #1db954;
+    border-radius: 50%;
+    margin-top: -5px;
+    transition: transform 0.1s ease;
+}
+
+.player-center input[type="range"]::-webkit-slider-thumb:hover,
+.player-right input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.player-right {
+    width: 25%;
+    text-align: right;
+}
+
+.player-right input[type="range"] {
+    width: 120px;
+}
+
+/* =========================
+   RECENTLY PLAYED
+========================= */
 #recentList {
     list-style: none;
     padding-left: 0;
