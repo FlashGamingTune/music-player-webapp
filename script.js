@@ -19,9 +19,9 @@ const playerState = {
     isShuffle: false,
     repeatMode: "off",
     favorites: JSON.parse(localStorage.getItem("favorites")) || [],
-    shuffleHistory: []
+    shuffleHistory: [],
+    recentlyPlayed: []
 };
-
 
 // Title  /  Displaying which song is playing 
 let currentObjectURL = null;
@@ -42,6 +42,29 @@ function loadSong() {
     playerState.isPlaying = true;
 
     updatePlayerUI();
+    updateRecentlyPlayed();
+}
+
+// Recently Played
+function updateRecentlyPlayed() {
+    const currentSong = playerState.songs[playerState.currentIndex];
+    if (!currentSong) return;
+
+    const songName = currentSong.name;
+
+    // Remove if already exists
+    playerState.recentlyPlayed =
+        playerState.recentlyPlayed.filter(name => name !== songName);
+
+    // Add to beginning
+    playerState.recentlyPlayed.unshift(songName);
+
+    // Keep only last 5
+    if (playerState.recentlyPlayed.length > 5) {
+        playerState.recentlyPlayed.pop();
+    }
+
+    renderRecentlyPlayed();
 }
 
 function updatePlayerUI() {
@@ -130,6 +153,18 @@ function playPreviousSong() {
     }
 
     loadSong();
+}
+
+// Recently Played List
+function renderRecentlyPlayed() {
+    const recentList = document.getElementById("recentList");
+    recentList.innerHTML = "";
+
+    playerState.recentlyPlayed.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        recentList.appendChild(li);
+    });
 }
 
 // Converting File to Playable File
