@@ -11,6 +11,7 @@ const timeDisplay = document.getElementById("timeDisplay");
 const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
+const themeToggle = document.getElementById("themeToggle");
 
 
 const playerState = {
@@ -365,5 +366,15 @@ document.addEventListener("keydown", (e) => {
         case "ArrowLeft":
             playPreviousSong();
             break;
+    }
+});
+
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("light-theme");
+
+    if (document.body.classList.contains("light-theme")) {
+        themeToggle.textContent = "☀️";
+    } else {
+        themeToggle.textContent = "🌙";
     }
 });
