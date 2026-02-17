@@ -67,8 +67,7 @@ function loadSong() {
 
     const song = playerState.songs[playerState.currentIndex];
 
-    audioPlayer.src =
-        `http://localhost:5000/stream/${song.filename}`;
+    audioPlayer.src = song.url;
 
     audioPlayer.play();
     playerState.isPlaying = true;
