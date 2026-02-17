@@ -1,4 +1,3 @@
-const fileInput = document.getElementById("fileInput");
 const songsContainer = document.getElementById("songsContainer");
 const audioPlayer = document.getElementById("audioPlayer");
 const playBtn = document.getElementById("playBtn");
@@ -12,6 +11,8 @@ const volumeSlider = document.getElementById("volumeSlider");
 const shuffleBtn = document.getElementById("shuffleBtn");
 const repeatBtn = document.getElementById("repeatBtn");
 const themeToggle = document.getElementById("themeToggle");
+const uploadInput = document.getElementById("uploadInput");
+const uploadBtn = document.getElementById("uploadBtn");
 
 
 const playerState = {
@@ -26,19 +27,48 @@ const playerState = {
 };
 
 let animationFrameId = null;
-let currentObjectURL = null;
+
+// Load Songs From Backend
+async function loadSongsFromServer() {
+
+    console.log("Loading songs from backend...");
+
+    const response = await fetch("http://localhost:5000/songs");
+    const songs = await response.json();
+
+    playerState.songs = songs;
+
+    renderSongs();
+}
+
+function renderSongs() {
+    songsContainer.innerHTML = "";
+
+    playerState.songs.forEach((song, index) => {
+
+        const songDiv = document.createElement("div");
+        songDiv.className = "song-card";
+
+        songDiv.innerHTML = `
+            <span>${song.name}</span>
+        `;
+
+        songDiv.addEventListener("click", () => {
+            playerState.currentIndex = index;
+            loadSong();
+        });
+
+        songsContainer.appendChild(songDiv);
+    });
+}
 
 function loadSong() {
     if (!playerState.songs[playerState.currentIndex]) return;
 
-    if (currentObjectURL) {
-        URL.revokeObjectURL(currentObjectURL);
-    }
+    const song = playerState.songs[playerState.currentIndex];
 
-    const file = playerState.songs[playerState.currentIndex];
-
-    currentObjectURL = URL.createObjectURL(file);
-    audioPlayer.src = currentObjectURL;
+    audioPlayer.src =
+        `http://localhost:5000/stream/${song.filename}`;
 
     audioPlayer.play();
     playerState.isPlaying = true;
@@ -85,33 +115,33 @@ function updatePlayerUI() {
     playBtn.textContent = playerState.isPlaying ? "⏸" : "▶";
 
     highlightActiveSong();
-    
-    const miniCover = document.querySelector(".mini-cover");
 
-    jsmediatags.read(file, {
-        onSuccess: function(tag) {
-            if (tag.tags.picture) {
-                const { data, format } = tag.tags.picture;
-                let base64String = "";
+    // const miniCover = document.querySelector(".mini-cover");
 
-                for (let i = 0; i < data.length; i++) {
-                    base64String += String.fromCharCode(data[i]);
-                }
+    // jsmediatags.read(file, {
+    //     onSuccess: function (tag) {
+    //         if (tag.tags.picture) {
+    //             const { data, format } = tag.tags.picture;
+    //             let base64String = "";
 
-                const coverUrl =
-                    `data:${format};base64,${window.btoa(base64String)}`;
+    //             for (let i = 0; i < data.length; i++) {
+    //                 base64String += String.fromCharCode(data[i]);
+    //             }
 
-                miniCover.style.backgroundImage = `url(${coverUrl})`;
-                miniCover.style.backgroundSize = "cover";
-                miniCover.style.backgroundPosition = "center";
-            } else {
-                miniCover.style.backgroundImage = "none";
-            }
-        },
-        onError: function(error) {
-            console.log("Cover error:", error);
-        }
-    });
+    //             const coverUrl =
+    //                 `data:${format};base64,${window.btoa(base64String)}`;
+
+    //             miniCover.style.backgroundImage = `url(${coverUrl})`;
+    //             miniCover.style.backgroundSize = "cover";
+    //             miniCover.style.backgroundPosition = "center";
+    //         } else {
+    //             miniCover.style.backgroundImage = "none";
+    //         }
+    //     },
+    //     onError: function (error) {
+    //         console.log("Cover error:", error);
+    //     }
+    // });
 }
 
 
@@ -243,69 +273,70 @@ function updateProgressBarSmooth() {
 }
 
 // Converting File to Playable File
-fileInput.addEventListener("change", function () {
-    playerState.songs = Array.from(this.files);
-    songsContainer.innerHTML = "";
+// fileInput.addEventListener("change", function () {
+//     playerState.songs = Array.from(this.files);
+//     songsContainer.innerHTML = "";
 
-    playerState.songs.forEach((file, index) => {
+//     playerState.songs.forEach((file, index) => {
 
-        jsmediatags.read(file, {
-            onSuccess: function (tag) {
+//         jsmediatags.read(file, {
+//             onSuccess: function (tag) {
 
-                let coverUrl = null;
+//                 let coverUrl = null;
 
-                if (tag.tags.picture) {
-                    const { data, format } = tag.tags.picture;
-                    let base64String = "";
-                    for (let i = 0; i < data.length; i++) {
-                        base64String += String.fromCharCode(data[i]);
-                    }
-                    coverUrl = `data:${format};base64,${window.btoa(base64String)}`;
-                }
+//                 if (tag.tags.picture) {
+//                     const { data, format } = tag.tags.picture;
+//                     let base64String = "";
+//                     for (let i = 0; i < data.length; i++) {
+//                         base64String += String.fromCharCode(data[i]);
+//                     }
+//                     coverUrl = `data:${format};base64,${window.btoa(base64String)}`;
+//                 }
 
-                const songDiv = document.createElement("div");
-                songDiv.className = "song-card";
+//                 const songDiv = document.createElement("div");
+//                 songDiv.className = "song-card";
 
-                songDiv.innerHTML = `
-                <img src="${coverUrl || 'https://via.placeholder.com/50'}" 
-                     class="cover-img">
-                <span>${file.name}</span>
-                <button class="favBtn">♡</button>
-            `;
+//                 songDiv.innerHTML = `
+//                 <img src="${coverUrl || 'https://via.placeholder.com/50'}" 
+//                      class="cover-img">
+//                 <span>${file.name}</span>
+//                 <button class="favBtn">♡</button>
+//             `;
 
-                const favBtn = songDiv.querySelector(".favBtn");
+//                 const favBtn = songDiv.querySelector(".favBtn");
 
-                favBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
+//                 favBtn.addEventListener("click", (e) => {
+//                     e.stopPropagation();
 
-                    if (playerState.favorites.includes(file.name)) {
-                        playerState.favorites =
-                            playerState.favorites.filter(name => name !== file.name);
-                        favBtn.textContent = "♡";
-                    } else {
-                        playerState.favorites.push(file.name);
-                        favBtn.textContent = "❤️";
-                    }
+//                     if (playerState.favorites.includes(file.name)) {
+//                         playerState.favorites =
+//                             playerState.favorites.filter(name => name !== file.name);
+//                         favBtn.textContent = "♡";
+//                     } else {
+//                         playerState.favorites.push(file.name);
+//                         favBtn.textContent = "❤️";
+//                     }
 
-                    localStorage.setItem("favorites",
-                        JSON.stringify(playerState.favorites));
-                });
+//                     localStorage.setItem("favorites",
+//                         JSON.stringify(playerState.favorites));
+//                 });
 
-                songDiv.addEventListener("click", () => {
-                    playerState.currentIndex = index;
-                    loadSong();
-                });
+//                 songDiv.addEventListener("click", () => {
+//                     playerState.currentIndex = index;
+//                     loadSong();
+//                 });
 
-                songsContainer.appendChild(songDiv);
-            },
+//                 songsContainer.appendChild(songDiv);
+//             },
 
-            onError: function (error) {
-                console.log("Metadata error:", error);
-            }
-        });
+//             onError: function (error) {
+//                 console.log("Metadata error:", error);
+//             }
+//         });
 
-    });
-});
+//     });
+// });
+
 
 // Checking For Clicks to Convert ▶ <-> ⏸
 playBtn.addEventListener("click", togglePlayPause);
@@ -428,4 +459,43 @@ themeToggle.addEventListener("click", () => {
     } else {
         themeToggle.textContent = "🌙";
     }
+});
+
+uploadBtn.addEventListener("click", async () => {
+    const file = uploadInput.files[0];
+
+    if (!file) {
+        alert("Please select a song first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("song", file);
+
+    try {
+        const response = await fetch("http://localhost:5000/upload", {
+            method: "POST",
+            headers: {
+                "x-admin-key": "12345"
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+
+        alert(result.message);
+
+        uploadInput.value = "";
+
+        // Reload songs after upload
+        loadSongsFromServer();
+
+    } catch (error) {
+        console.error("Upload failed:", error);
+    }
+});
+
+// load songs automatically
+document.addEventListener("DOMContentLoaded", () => {
+    loadSongsFromServer();
 });

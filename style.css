@@ -129,6 +129,25 @@ body {
     transform: scale(1.01);
 }
 
+/* =======================
+    Uppload Section
+=========================== */
+.upload-section {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.upload-section button {
+    padding: 6px 12px;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
 /* =========================
    PLAYER BAR
 ========================= */
