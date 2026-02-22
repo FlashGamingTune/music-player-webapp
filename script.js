@@ -13,6 +13,7 @@ const repeatBtn = document.getElementById("repeatBtn");
 const themeToggle = document.getElementById("themeToggle");
 const uploadInput = document.getElementById("uploadInput");
 const uploadBtn = document.getElementById("uploadBtn");
+const API_BASE = "https://music-player-backend-hkkd.onrender.com";
 
 
 const playerState = {
@@ -33,7 +34,7 @@ async function loadSongsFromServer() {
 
     console.log("Loading songs from backend...");
 
-    const response = await fetch("https://music-player-backend-hkkd.onrender.com/songs");
+    const response = await fetch(`${API_BASE}/songs`);
     const songs = await response.json();
 
     playerState.songs = songs;
@@ -114,35 +115,7 @@ function updatePlayerUI() {
     playBtn.textContent = playerState.isPlaying ? "⏸" : "▶";
 
     highlightActiveSong();
-
-    // const miniCover = document.querySelector(".mini-cover");
-
-    // jsmediatags.read(file, {
-    //     onSuccess: function (tag) {
-    //         if (tag.tags.picture) {
-    //             const { data, format } = tag.tags.picture;
-    //             let base64String = "";
-
-    //             for (let i = 0; i < data.length; i++) {
-    //                 base64String += String.fromCharCode(data[i]);
-    //             }
-
-    //             const coverUrl =
-    //                 `data:${format};base64,${window.btoa(base64String)}`;
-
-    //             miniCover.style.backgroundImage = `url(${coverUrl})`;
-    //             miniCover.style.backgroundSize = "cover";
-    //             miniCover.style.backgroundPosition = "center";
-    //         } else {
-    //             miniCover.style.backgroundImage = "none";
-    //         }
-    //     },
-    //     onError: function (error) {
-    //         console.log("Cover error:", error);
-    //     }
-    // });
 }
-
 
 function highlightActiveSong() {
     const allCards = document.querySelectorAll(".song-card");
@@ -270,72 +243,6 @@ function updateProgressBarSmooth() {
 
     animationFrameId = requestAnimationFrame(updateProgressBarSmooth);
 }
-
-// Converting File to Playable File
-// fileInput.addEventListener("change", function () {
-//     playerState.songs = Array.from(this.files);
-//     songsContainer.innerHTML = "";
-
-//     playerState.songs.forEach((file, index) => {
-
-//         jsmediatags.read(file, {
-//             onSuccess: function (tag) {
-
-//                 let coverUrl = null;
-
-//                 if (tag.tags.picture) {
-//                     const { data, format } = tag.tags.picture;
-//                     let base64String = "";
-//                     for (let i = 0; i < data.length; i++) {
-//                         base64String += String.fromCharCode(data[i]);
-//                     }
-//                     coverUrl = `data:${format};base64,${window.btoa(base64String)}`;
-//                 }
-
-//                 const songDiv = document.createElement("div");
-//                 songDiv.className = "song-card";
-
-//                 songDiv.innerHTML = `
-//                 <img src="${coverUrl || 'https://via.placeholder.com/50'}" 
-//                      class="cover-img">
-//                 <span>${file.name}</span>
-//                 <button class="favBtn">♡</button>
-//             `;
-
-//                 const favBtn = songDiv.querySelector(".favBtn");
-
-//                 favBtn.addEventListener("click", (e) => {
-//                     e.stopPropagation();
-
-//                     if (playerState.favorites.includes(file.name)) {
-//                         playerState.favorites =
-//                             playerState.favorites.filter(name => name !== file.name);
-//                         favBtn.textContent = "♡";
-//                     } else {
-//                         playerState.favorites.push(file.name);
-//                         favBtn.textContent = "❤️";
-//                     }
-
-//                     localStorage.setItem("favorites",
-//                         JSON.stringify(playerState.favorites));
-//                 });
-
-//                 songDiv.addEventListener("click", () => {
-//                     playerState.currentIndex = index;
-//                     loadSong();
-//                 });
-
-//                 songsContainer.appendChild(songDiv);
-//             },
-
-//             onError: function (error) {
-//                 console.log("Metadata error:", error);
-//             }
-//         });
-
-//     });
-// });
-
 
 // Checking For Clicks to Convert ▶ <-> ⏸
 playBtn.addEventListener("click", togglePlayPause);
@@ -472,7 +379,7 @@ uploadBtn.addEventListener("click", async () => {
     formData.append("song", file);
 
     try {
-        const response = await fetch("https://music-player-backend-hkkd.onrender.com/upload", {
+        const response = await fetch(`${API_BASE}/upload`, {
             method: "POST",
             headers: {
                 "x-admin-key": "12345"
