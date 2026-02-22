@@ -33,7 +33,7 @@ async function loadSongsFromServer() {
 
     console.log("Loading songs from backend...");
 
-    const response = await fetch("http://localhost:5000/songs");
+    const response = await fetch("https://music-player-backend-hkkd.onrender.com/songs");
     const songs = await response.json();
 
     playerState.songs = songs;
@@ -472,7 +472,7 @@ uploadBtn.addEventListener("click", async () => {
     formData.append("song", file);
 
     try {
-        const response = await fetch("http://localhost:5000/upload", {
+        const response = await fetch("https://music-player-backend-hkkd.onrender.com/upload", {
             method: "POST",
             headers: {
                 "x-admin-key": "12345"
